@@ -1,0 +1,144 @@
+from tkinter import*
+import mysql.connector
+mygb= mysql.connector.connect (host="localhost", user ="Aanya", password = "Aanya@123", database = "db")
+print(mygb)
+
+crsr=mygb.cursor()
+#crsr.execute("create database db")
+
+#f = crsr.execute("show databases")
+#for i in f:
+ #   print(i)
+
+
+
+
+#crsr.execute("""create table registry (
+    #ausername text, 
+    #bpassword int,
+    #cemail text 
+          #    )""")
+#mygb.commit()
+
+
+
+
+
+screen=Tk()
+screen.geometry("700x700")
+screen.title("Registry")
+screen.configure(bg="White")
+
+
+
+
+
+
+def update():
+ screen2=Tk()
+ screen.geometry("700x700")
+ screen.title("Registry Page 2")
+ screen.configure(bg="White")
+ global e11
+ global e22
+ global e33
+
+ l11=Label(screen2, text="Username",bg="black", fg="white")  
+ l11.grid(row=0, column=0)
+
+ e11=Entry(screen2, fg="black", width=90)
+ e11.grid(row=0, column=1)
+
+ l22=Label(screen2, text="Password",bg="black", fg="white")  
+ l22.grid(row=2, column=0)
+
+ e22=Entry(screen2, fg="black", width=90)
+ e22.grid(row=2, column=1)
+
+ l33=Label(screen2, text="Email",bg="black", fg="white")  
+ l33.grid(row=3, column=0)
+
+ e33=Entry(screen2, fg="black", width=90)
+ e33.grid(row=3, column=1)
+
+ b11=Button(screen ,text="Add", bg = "black", fg = "white", command = add)
+ b11.grid(row = 4, column = 0)
+
+ b22=Button(screen ,text="Edit", bg = "black", fg = "white", command = edit)
+ b22.grid(row = 5, column = 0)
+
+def delete():
+   f=e4.get()
+   d="""delete from registry where cemail = %s"""
+   crsr.execute(d,(f,))
+   mygb.commit()
+
+
+
+def edit():
+   data=(e11.get(), e22.get(), e33.get())
+   crsr.execute("update registry set ausername=%s, bpassword= %s, cemail= %s", data)
+   mygb.commit()            
+
+
+
+
+
+
+
+l1=Label(screen, text="Username",bg="white", fg="black")  
+l1.grid(row=0, column=0)
+
+e1=Entry(screen, fg="black", width=90)
+e1.grid(row=0, column=1)
+
+l2=Label(screen, text="Password",bg="white", fg="black")  
+l2.grid(row=2, column=0)
+
+e2=Entry(screen, fg="black", width=90)
+e2.grid(row=2, column=1)
+
+l3=Label(screen, text="Email Address",bg="white", fg="black")  
+l3.grid(row=3, column=0)
+
+e3=Entry(screen, fg="black", width=90)
+e3.grid(row=3, column=1)
+global e4
+e4=Entry(screen, fg="black", width=90)
+e4.grid(row=4, column=1)
+
+
+def add():
+    a = (e1.get(), e2.get(),e3.get())
+    b = "insert into registry(ausername, bpassword, cemail)values(%s,%s, %s)" 
+   
+    crsr.execute(b,a)
+    mygb.commit()
+    e1.delete(0,END),
+    e2.delete(0,END),
+    e3.delete(0,END)
+
+def query():
+    id=e4.get()
+    crsr.execute("SELECT * from registry where cemail=%s", (e4.get(),))
+
+    a=crsr.fetchall()
+
+    b=""
+
+    for c in a:
+        b +=str(c[0]) + "\n" +str(c[1])+ "\n" +str(c[2]) + "\n" 
+    mygb.commit()
+    l=Label(screen, text=b)
+    l.grid(row=8 ,column =0)
+
+
+
+
+
+
+
+
+
+
+

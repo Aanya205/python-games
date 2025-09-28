@@ -1,0 +1,127 @@
+import pygame
+import math
+
+pygame.init()
+window = pygame.display.set_mode((800,500))
+pygame.display.set_caption('Angry Bird Game')
+
+# Load images
+angrybird_img = pygame.image.load("angry birds/angry bird picutre.png")
+angrybird_img = pygame.transform.scale(angrybird_img, (100,100))
+pig_img = pygame.image.load("angry birds/angry bird pig picture.png")
+pig_img = pygame.transform.scale(pig_img, (100,100))
+bg_img = pygame.image.load("angry birds/angry bird background image.jpg")
+bg_img = pygame.transform.scale(bg_img, (800,500))
+refresh_img = pygame.image.load("angry birds/refresh button image.jpg")
+refresh_img = pygame.transform.scale(refresh_img, (100,100))
+close_img = pygame.image.load("angry birds/close button image.png")
+close_img = pygame.transform.scale(close_img, (100,100))
+
+# Initialize clock
+clock = pygame.time.Clock()
+
+# Variables
+score = 0
+game_over = False
+
+# Functions
+def showscore():
+    if not pygame.font.get_init():
+        pygame.font.init()
+    score_font = pygame.font.SysFont("Arial", 50)
+    score_surface = score_font.render("Score: " + str(score), True, (255,255,255))
+    window.blit(score_surface, (125,10))
+
+def gameover():
+    if not pygame.font.get_init():
+        pygame.font.init()
+    gameover_font = pygame.font.SysFont("Impact", 100)
+    gameover_surface = gameover_font.render("Game Over!", True, (200,0,0))
+    window.blit(bg_img, (0,0))
+    showscore()  # Show score before game over message
+    window.blit(gameover_surface, (60,200))
+
+# Bird class
+class Bird:
+    def __init__(self, x, y, image):
+        self.image = image
+        self.rect = self.image.get_rect(topleft=(x,y))
+        self.original_position = (x,y)
+        self.velocity = [0,0]
+        self.dragging = False
+        self.drag_start_pos = (0,0)
+
+    def update(self):
+        if self.dragging:
+            mouse_pos = pygame.mouse.get_pos()
+            self.rect.center = mouse_pos
+        else:
+            self.rect.x += self.velocity[0]
+            self.rect.y += self.velocity[1]
+            distance = math.sqrt((self.rect.x - self.original_position[0])**2 + (self.rect.y - self.original_position[1])**2)
+            if distance > 300:
+                self.reset_pos()
+
+    def start_drag(self):
+        self.dragging = True
+        self.drag_start_pos = self.rect.center
+
+    def end_drag(self):
+        self.dragging = False
+        mouse_pos = pygame.mouse.get_pos()
+        speed = 10
+        direction = [mouse_pos[0] - self.rect.centerx, mouse_pos[1] - self.rect.centery]
+        length = math.sqrt(direction[0]**2 + direction[1]**2)
+        direction = [d/length for d in direction]  # Normalize direction
+        self.velocity = [direction[0] * speed, direction[1] * speed]
+
+    def reset_pos(self):
+        self.rect.topleft = self.original_position
+        self.velocity = [0,0]
+
+# Pig class
+class Pig:
+    def __init__(self, x, y, image):
+        self.image = image
+        self.rect = self.image.get_rect(topleft=(x,y))
+        self.hit = False
+
+
+bird = Bird(100,200, angrybird_img)
+pig_list = [Pig(500, 200, pig_img),Pig(650, 250, pig_img), Pig(300, 300, pig_img) ]
+
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            exit()
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            bird.start_drag()
+        if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+            bird.end_drag()
+    if not game_over:
+        window.blit(bg_img, (0,0))
+        bird.update()
+        for pig in pig_list:
+            if bird.rect.colliderect(pig.rect):
+                if not pig.hit:
+                    pig.hit = True
+                    score+=1
+                    bird.reset_pos()
+                    if all(pig.hit for pig in pig_list):
+                        game_over = True
+                break
+
+        window.blit(bird.image, bird.rect)
+        for pig in pig_list:
+            if not pig.hit:
+               window.blit(pig.image, pig.rect)
+        showscore()
+        if all(pig.hit for pig in pig_list):
+            game_over = True
+        if game_over:
+            gameover()
+    else:
+        gameover()
+    pygame.display.update()

@@ -1,0 +1,34 @@
+import turtle
+
+screen = turtle.getscreen()
+screen.setup(width=700, height=700)
+screen.title("Maze Game")
+screen.bgcolor("skyblue")
+
+man = turtle.Turtle()
+man.penup()
+man.goto(500, 350)
+man.color("red")
+man.shape("circle")
+man.shapesize(stretch_wid=1, stretch_len=1)
+
+rectangle1 = turtle.Turtle()
+rectangle1.pendown()
+rectangle1.goto(350,350)
+rectangle1.shapesize(stretch_wid=1, stretch_len=1)
+rectangle1.penup()
+
+
+
+
+while True:
+  screen.update()
+
+
+
+
+
+
+
+
+
